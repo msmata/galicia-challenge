@@ -1,5 +1,7 @@
 package com.msmata.challenge.controllers;
 
+import com.msmata.challenge.entities.Product;
+import com.msmata.challenge.repositories.ProductRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

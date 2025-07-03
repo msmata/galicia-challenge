@@ -1,5 +1,11 @@
-package com.example.products;
+package com.msmata.challenge.controllers;
 
+import com.msmata.challenge.entities.Product;
+import com.msmata.challenge.entities.ShoppingCart;
+import com.msmata.challenge.repositories.ProductRepository;
+import com.msmata.challenge.repositories.ShoppingCartRepository;
+import com.msmata.challenge.requests.CreateCartRequest;
+import com.msmata.challenge.services.ShoppingCartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,10 +45,12 @@ public class ShoppingCartController {
 
     @PutMapping("/{cartId}/product/{productId}")
     public ResponseEntity<ShoppingCart> updateCartProducts(@PathVariable String cartId, @PathVariable String productId) {
+        /*
         return cartRepository.findById(id).map(cart -> {
             List<Product> products = productRepository.findAllById(productIds);
             cart.setProducts(products);
             return ResponseEntity.ok(cartRepository.save(cart));
-        }).orElse(ResponseEntity.notFound().build());
+        }).orElse(ResponseEntity.notFound().build());*/
+        return ResponseEntity.ok(null);
     }
 }
