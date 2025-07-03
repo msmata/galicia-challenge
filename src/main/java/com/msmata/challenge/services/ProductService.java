@@ -1,5 +1,8 @@
 package com.msmata.challenge.services;
 
+import com.msmata.challenge.entities.Product;
+import com.msmata.challenge.repositories.ProductRepository;
+
 import java.util.List;
 
 public class ProductService {

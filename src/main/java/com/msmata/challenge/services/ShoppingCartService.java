@@ -1,6 +1,10 @@
 package com.msmata.challenge.services;
 
+import com.msmata.challenge.entities.ShoppingCart;
+import com.msmata.challenge.repositories.ShoppingCartRepository;
+
 import java.util.List;
+import java.util.UUID;
 
 public class ShoppingCartService {
 
@@ -17,12 +21,11 @@ public class ShoppingCartService {
     public ShoppingCart createCart(String userID) {
         ShoppingCart cart = new ShoppingCart();
         cart.setUserId(userID);
-        ShoppingCart savedCart = cartRepository.save(cart);
 
-        return savedCart;
+        return cartRepository.save(cart);
     }
 
-    public void addProductToCart(String cartId, String productId) {
-        ShoppingCart cart = cartRepository.findById(cartId);
+    public void addProductToCart(UUID cartId, String productId) {
+        ShoppingCart cart = cartRepository.findById(cartId).get();
     }
 }

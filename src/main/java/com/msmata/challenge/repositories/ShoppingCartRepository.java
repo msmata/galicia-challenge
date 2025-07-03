@@ -1,5 +1,6 @@
-package com.example.products;
+package com.msmata.challenge.repositories;
 
+import com.msmata.challenge.entities.ShoppingCart;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
