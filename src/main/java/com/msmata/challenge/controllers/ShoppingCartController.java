@@ -1,8 +1,6 @@
 package com.msmata.challenge.controllers;
 
-import com.msmata.challenge.entities.Product;
 import com.msmata.challenge.entities.ShoppingCart;
-import com.msmata.challenge.repositories.ProductRepository;
 import com.msmata.challenge.repositories.ShoppingCartRepository;
 import com.msmata.challenge.requests.CreateCartRequest;
 import com.msmata.challenge.services.ShoppingCartService;
@@ -16,12 +14,10 @@ import java.util.*;
 public class ShoppingCartController {
 
     private final ShoppingCartRepository cartRepository;
-    private final ProductRepository productRepository;
     private final ShoppingCartService shoppingCartService;
 
-    public ShoppingCartController(ShoppingCartRepository cartRepository, ProductRepository productRepository, ShoppingCartService shoppingCartService) {
+    public ShoppingCartController(ShoppingCartRepository cartRepository, ShoppingCartService shoppingCartService) {
         this.cartRepository = cartRepository;
-        this.productRepository = productRepository;
         this.shoppingCartService = shoppingCartService;
     }
 

@@ -2,10 +2,12 @@ package com.msmata.challenge.services;
 
 import com.msmata.challenge.entities.ShoppingCart;
 import com.msmata.challenge.repositories.ShoppingCartRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class ShoppingCartService {
 
     private final ShoppingCartRepository cartRepository;
