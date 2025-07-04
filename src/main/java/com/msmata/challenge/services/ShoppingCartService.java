@@ -32,14 +32,14 @@ public class ShoppingCartService {
 
     public ShoppingCart addProductToCart(String cartId, String productId) {
         Product product = productRepository.findById(Long.valueOf(productId)).orElseThrow(() -> new ProductNotFoundException("Producto con id " + productId + " no encontrado"));
-        ShoppingCart cart = cartRepository.findById(cartId).orElseThrow(() -> new CartNotFoundException("Carrito con id " + cartId + " no encontrado"));
+        ShoppingCart cart = this.findById(cartId);
 
         cart.getProducts().add(product);
         return cartRepository.save(cart);
     }
 
     public ShoppingCart removeProduct(String cartId, String productId) {
-        ShoppingCart cart = cartRepository.findById(cartId).orElseThrow(() -> new CartNotFoundException("Carrito con id " + cartId + " no encontrado"));
+        ShoppingCart cart = this.findById(cartId);
         Product product = cart.getProducts().stream().filter(p -> p.getId().equals(Long.valueOf(productId))).findFirst().orElseThrow(() -> new ProductNotFoundException("Producto con id " + productId + " no encontrado"));
         cart.getProducts().remove(product);
 
