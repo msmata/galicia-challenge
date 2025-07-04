@@ -6,8 +6,6 @@ import com.msmata.challenge.repositories.ProductRepository;
 import com.msmata.challenge.repositories.ShoppingCartRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class ShoppingCartService {
 
@@ -17,10 +15,6 @@ public class ShoppingCartService {
     public ShoppingCartService(ShoppingCartRepository cartRepository, ProductRepository productRepository) {
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
-    }
-
-    public List<ShoppingCart> all() {
-        return cartRepository.findAll();
     }
 
     public ShoppingCart createCart(String userID) {
