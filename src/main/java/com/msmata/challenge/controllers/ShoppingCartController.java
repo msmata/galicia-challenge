@@ -27,10 +27,12 @@ public class ShoppingCartController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ShoppingCart> getCart(@PathVariable UUID id) {
-        return cartRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ShoppingCart> getCart(@PathVariable String id) {
+        try {
+            return ResponseEntity.ok(shoppingCartService.findById(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
@@ -41,12 +43,11 @@ public class ShoppingCartController {
 
     @PutMapping("/{cartId}/product/{productId}")
     public ResponseEntity<ShoppingCart> updateCartProducts(@PathVariable String cartId, @PathVariable String productId) {
-        /*
-        return cartRepository.findById(id).map(cart -> {
-            List<Product> products = productRepository.findAllById(productIds);
-            cart.setProducts(products);
-            return ResponseEntity.ok(cartRepository.save(cart));
-        }).orElse(ResponseEntity.notFound().build());*/
-        return ResponseEntity.ok(null);
+        try {
+            ShoppingCart shoppingCart = shoppingCartService.addProductToCart(cartId, productId);
+            return ResponseEntity.ok(shoppingCart);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

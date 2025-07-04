@@ -7,8 +7,7 @@ import java.util.*;
 public class ShoppingCart {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    private String id;
 
     private String userId;
 
@@ -20,11 +19,18 @@ public class ShoppingCart {
     )
     private List<Product> products = new ArrayList<>();
 
-    public UUID getId() {
+    @PrePersist
+    public void generateId() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
