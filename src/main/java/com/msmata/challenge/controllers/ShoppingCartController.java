@@ -1,23 +1,18 @@
 package com.msmata.challenge.controllers;
 
 import com.msmata.challenge.entities.ShoppingCart;
-import com.msmata.challenge.repositories.ShoppingCartRepository;
 import com.msmata.challenge.requests.CreateCartRequest;
 import com.msmata.challenge.services.ShoppingCartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-
 @RestController
 @RequestMapping("/carts")
 public class ShoppingCartController {
 
-    private final ShoppingCartRepository cartRepository;
     private final ShoppingCartService shoppingCartService;
 
-    public ShoppingCartController(ShoppingCartRepository cartRepository, ShoppingCartService shoppingCartService) {
-        this.cartRepository = cartRepository;
+    public ShoppingCartController(ShoppingCartService shoppingCartService) {
         this.shoppingCartService = shoppingCartService;
     }
 
