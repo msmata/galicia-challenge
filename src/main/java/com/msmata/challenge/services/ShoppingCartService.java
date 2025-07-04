@@ -35,4 +35,12 @@ public class ShoppingCartService {
         cart.getProducts().add(product);
         return cartRepository.save(cart);
     }
+
+    public ShoppingCart removeProduct(String cartId, String productId) {
+        ShoppingCart cart = cartRepository.findById(cartId).orElseThrow(RuntimeException::new);
+        Product product = cart.getProducts().stream().filter(p -> p.getId().equals(Long.valueOf(productId))).findFirst().orElseThrow(RuntimeException::new);
+        cart.getProducts().remove(product);
+
+        return cartRepository.save(cart);
+    }
 }

@@ -50,4 +50,14 @@ public class ShoppingCartController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @DeleteMapping("/{cartId}/product/{productId}")
+    public ResponseEntity<ShoppingCart> removeProduct(@PathVariable String cartId, @PathVariable String productId) {
+        try {
+            ShoppingCart shoppingCart = shoppingCartService.removeProduct(cartId, productId);
+            return ResponseEntity.ok(shoppingCart);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
