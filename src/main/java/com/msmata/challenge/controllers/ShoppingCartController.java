@@ -21,18 +21,9 @@ public class ShoppingCartController {
         this.shoppingCartService = shoppingCartService;
     }
 
-    @GetMapping
-    public List<ShoppingCart> getAllCarts() {
-        return cartRepository.findAll();
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ShoppingCart> getCart(@PathVariable String id) {
-        try {
-            return ResponseEntity.ok(shoppingCartService.findById(id));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(shoppingCartService.findById(id));
     }
 
     @PostMapping
@@ -43,21 +34,14 @@ public class ShoppingCartController {
 
     @PutMapping("/{cartId}/product/{productId}")
     public ResponseEntity<ShoppingCart> updateCartProducts(@PathVariable String cartId, @PathVariable String productId) {
-        try {
-            ShoppingCart shoppingCart = shoppingCartService.addProductToCart(cartId, productId);
-            return ResponseEntity.ok(shoppingCart);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        ShoppingCart shoppingCart = shoppingCartService.addProductToCart(cartId, productId);
+        return ResponseEntity.ok(shoppingCart);
+
     }
 
     @DeleteMapping("/{cartId}/product/{productId}")
     public ResponseEntity<ShoppingCart> removeProduct(@PathVariable String cartId, @PathVariable String productId) {
-        try {
-            ShoppingCart shoppingCart = shoppingCartService.removeProduct(cartId, productId);
-            return ResponseEntity.ok(shoppingCart);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        ShoppingCart shoppingCart = shoppingCartService.removeProduct(cartId, productId);
+        return ResponseEntity.ok(shoppingCart);
     }
 }
