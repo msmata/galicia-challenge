@@ -6,7 +6,9 @@ import com.msmata.challenge.services.ShoppingCartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/carts")
@@ -45,5 +47,13 @@ public class ShoppingCartController {
     public ResponseEntity<List<ShoppingCart>> listShoppingCarts(@PathVariable String userId) {
         List<ShoppingCart> userCarts = shoppingCartService.getUserCarts(userId);
         return ResponseEntity.ok(userCarts);
+    }
+
+    @PostMapping("/{id}/process")
+    public ResponseEntity<Map<String, String>> processCart(@PathVariable String id) {
+        shoppingCartService.processOrder(id);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Estamos procesando su orden");
+        return ResponseEntity.accepted().body(response);
     }
 }
