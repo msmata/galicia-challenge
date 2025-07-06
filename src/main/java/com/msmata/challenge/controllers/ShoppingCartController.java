@@ -6,6 +6,8 @@ import com.msmata.challenge.services.ShoppingCartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/carts")
 public class ShoppingCartController {
@@ -31,12 +33,17 @@ public class ShoppingCartController {
     public ResponseEntity<ShoppingCart> updateCartProducts(@PathVariable String cartId, @PathVariable String productId) {
         ShoppingCart shoppingCart = shoppingCartService.addProductToCart(cartId, productId);
         return ResponseEntity.ok(shoppingCart);
-
     }
 
     @DeleteMapping("/{cartId}/product/{productId}")
     public ResponseEntity<ShoppingCart> removeProduct(@PathVariable String cartId, @PathVariable String productId) {
         ShoppingCart shoppingCart = shoppingCartService.removeProduct(cartId, productId);
         return ResponseEntity.ok(shoppingCart);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ShoppingCart>> listShoppingCarts(@PathVariable String userId) {
+        List<ShoppingCart> userCarts = shoppingCartService.getUserCarts(userId);
+        return ResponseEntity.ok(userCarts);
     }
 }

@@ -8,6 +8,8 @@ import com.msmata.challenge.exceptions.CartNotFoundException;
 import com.msmata.challenge.exceptions.ProductNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ShoppingCartService {
 
@@ -44,5 +46,9 @@ public class ShoppingCartService {
         cart.getProducts().remove(product);
 
         return cartRepository.save(cart);
+    }
+
+    public List<ShoppingCart> getUserCarts(String userId) {
+        return cartRepository.findByUserId(userId);
     }
 }
