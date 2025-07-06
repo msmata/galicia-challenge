@@ -8,6 +8,7 @@ import com.msmata.challenge.repositories.ProductRepository;
 import com.msmata.challenge.repositories.ShoppingCartRepository;
 import com.msmata.challenge.exceptions.CartNotFoundException;
 import com.msmata.challenge.exceptions.ProductNotFoundException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 @Service
 public class ShoppingCartService {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ShoppingCartService.class);
 
     private final ShoppingCartRepository cartRepository;
     private final ProductRepository productRepository;
@@ -60,18 +61,16 @@ public class ShoppingCartService {
     public void processOrder(String cartId) {
         logger.info("Inicio del procesamiento asincrónico del carrito: {}", cartId);
 
-        cartRepository.findById(cartId).ifPresent(cart -> {
+        cartRepository.findByIdWithProducts(cartId).ifPresent(cart -> {
             double total = cart.getProducts().stream()
                 .mapToDouble(Product::getPrice)
                 .sum();
 
-            // Simular descuento
             if (total > 5000) {
                 total *= 0.9; // 10% de descuento
                 logger.info("Descuento aplicado. Nuevo total: {}", total);
             }
 
-            // Simular validación y procesamiento
             try {
                 logger.info("Validando y procesando orden del carrito {}", cartId);
                 Thread.sleep(3000); // simulación
