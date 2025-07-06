@@ -1,5 +1,6 @@
 package com.msmata.challenge.services;
 
+import com.msmata.challenge.entities.Discount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.msmata.challenge.entities.Product;
@@ -23,9 +24,10 @@ public class ShoppingCartService {
     private final ProductRepository productRepository;
     private final DiscountRepository discountRepository;
 
-    public ShoppingCartService(ShoppingCartRepository cartRepository, ProductRepository productRepository) {
+    public ShoppingCartService(ShoppingCartRepository cartRepository, ProductRepository productRepository, DiscountRepository discountRepository) {
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
+        this.discountRepository = discountRepository;
     }
 
     public ShoppingCart createCart(String userID) {
@@ -68,7 +70,7 @@ public class ShoppingCartService {
 
             for (Product p : cart.getProducts()) {
                 double discount = discountRepository.findByCategory(p.getCategory())
-                    .map(Descuento::getPercent)
+                    .map(Discount::getPercent)
                     .orElse(0.0);
                 double priceWithDiscount = p.getPrice() * (1 - discount);
                 total += priceWithDiscount;
