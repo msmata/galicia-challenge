@@ -1,5 +1,7 @@
 package com.msmata.challenge.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.msmata.challenge.entities.Product;
 import com.msmata.challenge.entities.ShoppingCart;
 import com.msmata.challenge.repositories.ProductRepository;
@@ -12,6 +14,8 @@ import java.util.List;
 
 @Service
 public class ShoppingCartService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     private final ShoppingCartRepository cartRepository;
     private final ProductRepository productRepository;
@@ -50,5 +54,32 @@ public class ShoppingCartService {
 
     public List<ShoppingCart> getUserCarts(String userId) {
         return cartRepository.findByUserId(userId);
+    }
+
+    @Async
+    public void processOrder(String cartId) {
+        logger.info("Inicio del procesamiento asincrónico del carrito: {}", cartId);
+
+        cartRepository.findById(cartId).ifPresent(cart -> {
+            double total = cart.getProducts().stream()
+                .mapToDouble(Product::getPrice)
+                .sum();
+
+            // Simular descuento
+            if (total > 5000) {
+                total *= 0.9; // 10% de descuento
+                logger.info("Descuento aplicado. Nuevo total: {}", total);
+            }
+
+            // Simular validación y procesamiento
+            try {
+                logger.info("Validando y procesando orden del carrito {}", cartId);
+                Thread.sleep(3000); // simulación
+                logger.info("Orden procesada correctamente para el usuario {}", cart.getUserId());
+            } catch (InterruptedException e) {
+                logger.error("Error en el procesamiento del carrito {}", cartId, e);
+                Thread.currentThread().interrupt();
+            }
+        });
     }
 }
