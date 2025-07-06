@@ -6,6 +6,7 @@ import com.msmata.challenge.entities.Product;
 import com.msmata.challenge.entities.ShoppingCart;
 import com.msmata.challenge.repositories.ProductRepository;
 import com.msmata.challenge.repositories.ShoppingCartRepository;
+import com.msmata.challenge.repositories.DiscountRepository;
 import com.msmata.challenge.exceptions.CartNotFoundException;
 import com.msmata.challenge.exceptions.ProductNotFoundException;
 import org.springframework.scheduling.annotation.Async;
@@ -20,6 +21,7 @@ public class ShoppingCartService {
 
     private final ShoppingCartRepository cartRepository;
     private final ProductRepository productRepository;
+    private final DiscountRepository discountRepository;
 
     public ShoppingCartService(ShoppingCartRepository cartRepository, ProductRepository productRepository) {
         this.cartRepository = cartRepository;
@@ -62,18 +64,21 @@ public class ShoppingCartService {
         logger.info("Inicio del procesamiento asincrónico del carrito: {}", cartId);
 
         cartRepository.findByIdWithProducts(cartId).ifPresent(cart -> {
-            double total = cart.getProducts().stream()
-                .mapToDouble(Product::getPrice)
-                .sum();
+            double total = 0.0;
 
-            if (total > 5000) {
-                total *= 0.9; // 10% de descuento
-                logger.info("Descuento aplicado. Nuevo total: {}", total);
+            for (Product p : cart.getProducts()) {
+                double discount = discountRepository.findByCategory(p.getCategory())
+                    .map(Descuento::getPercent)
+                    .orElse(0.0);
+                double priceWithDiscount = p.getPrice() * (1 - discount);
+                total += priceWithDiscount;
             }
+
+            logger.info("Descuento aplicado. Nuevo total: {}", total);
 
             try {
                 logger.info("Validando y procesando orden del carrito {}", cartId);
-                Thread.sleep(3000); // simulación
+                Thread.sleep(3000);
                 logger.info("Orden procesada correctamente para el usuario {}", cart.getUserId());
             } catch (InterruptedException e) {
                 logger.error("Error en el procesamiento del carrito {}", cartId, e);
