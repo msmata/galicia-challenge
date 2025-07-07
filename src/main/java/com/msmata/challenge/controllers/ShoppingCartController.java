@@ -7,6 +7,7 @@ import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,8 @@ public class ShoppingCartController {
     @ApiOperation("Crear un carrito de compras para un userID determinado")
     public ResponseEntity<ShoppingCart> createCart(@ApiParam("Request con ID del usuario") @RequestBody CreateCartRequest request) {
         ShoppingCart saved = shoppingCartService.createCart(request.getUserId());
-        return ResponseEntity.ok(saved);
+        URI location = URI.create("/carts/" + saved.getId());
+        return ResponseEntity.created(location).body(saved);
     }
 
     @PutMapping("/{cartId}/product/{productId}")
