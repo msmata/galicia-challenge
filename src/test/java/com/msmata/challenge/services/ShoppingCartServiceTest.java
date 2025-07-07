@@ -1,13 +1,14 @@
 package com.msmata.challenge.services;
 
 import com.msmata.challenge.entities.ShoppingCart;
+import com.msmata.challenge.exceptions.CartNotFoundException;
 import com.msmata.challenge.repositories.DiscountRepository;
 import com.msmata.challenge.repositories.ProductRepository;
 import com.msmata.challenge.repositories.ShoppingCartRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,10 +27,14 @@ public class ShoppingCartServiceTest {
     @Mock
     private ProductRepository productRepository;
 
-    @InjectMocks
     private ShoppingCartService shoppingCartService;
 
     ShoppingCart shoppingCartResponse;
+
+    @BeforeEach
+    void setup() {
+        shoppingCartService = new ShoppingCartService(shoppingCartRepository, productRepository, discountRepository);
+    }
 
     @Test
     public void findByIdReturnsAShoppingCart() {
@@ -38,10 +43,25 @@ public class ShoppingCartServiceTest {
         thenAShoppingCartWithIdIsReturned("1234");
     }
 
+    @Test
+    public void findByIdDoesNotFindAShoppingCart() {
+        givenAShoppingCartWithIdDoesNotExistInDB("123");
+
+        try {
+            whenFindByIdIsExecuted("123");
+        } catch (Exception e) {
+            Assertions.assertEquals(e.getMessage(), "Carrito con id 123 no encontrado");
+        }
+    }
+
     private void givenAShoppingCartWithIdExistsInDB(String id) {
         ShoppingCart mockShoppingCart = new ShoppingCart();
         mockShoppingCart.setId(id);
         Mockito.when(shoppingCartRepository.findById(id)).thenReturn(Optional.of(mockShoppingCart));
+    }
+
+    private void givenAShoppingCartWithIdDoesNotExistInDB(String id) {
+        Mockito.when(shoppingCartRepository.findById(id)).thenThrow(new CartNotFoundException("Carrito con id 123 no encontrado"));
     }
 
     private void whenFindByIdIsExecuted(String id) {
