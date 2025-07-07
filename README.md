@@ -11,8 +11,7 @@ La API permite:
 - Crear carritos de compra para un usuario
 - Agregar y eliminar productos del carrito
 - Obtener carritos por ID o por usuario
-- Procesar órdenes asincrónicamente (simulado)
-- Aplicar descuentos automáticos según la categoría de los productos
+- Procesar órdenes asincrónicamente (simulado) aplicando descuentos automáticos según la categoría de los productos
 
 ---
 
