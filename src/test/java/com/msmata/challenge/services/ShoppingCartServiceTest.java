@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +32,7 @@ public class ShoppingCartServiceTest {
     private ShoppingCartService shoppingCartService;
 
     ShoppingCart shoppingCartResponse;
+    List<ShoppingCart> userShoppingCartResponse;
 
     @BeforeEach
     void setup() {
@@ -61,6 +64,22 @@ public class ShoppingCartServiceTest {
         thenAShoppingCartWithUserIdIsReturned("12345");
     }
 
+    @Test
+    public void getUserCartsReturnsACart() {
+        givenUserWithUserIdHasACartWithCartId("1234", "12345");
+        whenGetUserCartsIsExecuted("1234");
+        thenACartWithCartIdIsReturned("1234", "12345");
+    }
+
+    private void givenUserWithUserIdHasACartWithCartId(String userId, String cartId) {
+        List<ShoppingCart> mockShoppingCartList = new ArrayList<>();
+        ShoppingCart mockShoppingCart = new ShoppingCart();
+        mockShoppingCart.setUserId(userId);
+        mockShoppingCart.setId(cartId);
+        mockShoppingCartList.add(mockShoppingCart);
+        Mockito.when(shoppingCartRepository.findByUserId(userId)).thenReturn(mockShoppingCartList);
+    }
+
     private void givenAShoppingCartWithUserIdIsCreated(String userId) {
         ShoppingCart mockShoppingCart = new ShoppingCart();
         mockShoppingCart.setUserId(userId);
@@ -85,11 +104,21 @@ public class ShoppingCartServiceTest {
         shoppingCartResponse = shoppingCartService.createCart(userId);
     }
 
+    private void whenGetUserCartsIsExecuted(String userId) {
+        userShoppingCartResponse = shoppingCartService.getUserCarts(userId);
+    }
+
     private void thenAShoppingCartWithIdIsReturned(String id) {
         Assertions.assertEquals(shoppingCartResponse.getId(), id);
     }
 
     private void thenAShoppingCartWithUserIdIsReturned(String userid) {
         Assertions.assertEquals(shoppingCartResponse.getUserId(), userid);
+    }
+
+    private void thenACartWithCartIdIsReturned(String userId, String cartId) {
+        ShoppingCart shoppingCart = userShoppingCartResponse.get(0);
+        Assertions.assertEquals(shoppingCart.getUserId(), userId);
+        Assertions.assertEquals(shoppingCart.getId(), cartId);
     }
 }
