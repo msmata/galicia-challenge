@@ -54,6 +54,19 @@ public class ShoppingCartServiceTest {
         }
     }
 
+    @Test
+    public void createCartReturnsAShoppingCart() {
+        givenAShoppingCartWithUserIdIsCreated("12345");
+        whenCreateCartIsExecuted("12345");
+        thenAShoppingCartWithUserIdIsReturned("12345");
+    }
+
+    private void givenAShoppingCartWithUserIdIsCreated(String userId) {
+        ShoppingCart mockShoppingCart = new ShoppingCart();
+        mockShoppingCart.setUserId(userId);
+        Mockito.when(shoppingCartRepository.save(Mockito.any(ShoppingCart.class))).thenReturn(mockShoppingCart);
+    }
+
     private void givenAShoppingCartWithIdExistsInDB(String id) {
         ShoppingCart mockShoppingCart = new ShoppingCart();
         mockShoppingCart.setId(id);
@@ -68,7 +81,15 @@ public class ShoppingCartServiceTest {
         shoppingCartResponse = shoppingCartService.findById(id);
     }
 
+    private void whenCreateCartIsExecuted(String userId) {
+        shoppingCartResponse = shoppingCartService.createCart(userId);
+    }
+
     private void thenAShoppingCartWithIdIsReturned(String id) {
         Assertions.assertEquals(shoppingCartResponse.getId(), id);
+    }
+
+    private void thenAShoppingCartWithUserIdIsReturned(String userid) {
+        Assertions.assertEquals(shoppingCartResponse.getUserId(), userid);
     }
 }
