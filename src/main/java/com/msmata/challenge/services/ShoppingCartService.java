@@ -1,6 +1,7 @@
 package com.msmata.challenge.services;
 
 import com.msmata.challenge.entities.Discount;
+import com.msmata.challenge.exceptions.ForbiddenAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.msmata.challenge.entities.Product;
@@ -37,20 +38,26 @@ public class ShoppingCartService {
         return cartRepository.save(cart);
     }
 
-    public ShoppingCart findById(String cartId) {
-        return cartRepository.findById(cartId).orElseThrow(() -> new CartNotFoundException("Carrito con id " + cartId + " no encontrado"));
+    public ShoppingCart findById(String cartId, String userId) {
+        ShoppingCart shoppingCart = cartRepository.findById(cartId).orElseThrow(() -> new CartNotFoundException("Carrito con id " + cartId + " no encontrado"));
+
+        if (!shoppingCart.getUserId().equals(userId)) {
+            throw new ForbiddenAccessException("Acceso prohibido a carrito");
+        }
+
+        return shoppingCart;
     }
 
     public ShoppingCart addProductToCart(String cartId, String productId) {
         Product product = productRepository.findById(Long.valueOf(productId)).orElseThrow(() -> new ProductNotFoundException("Producto con id " + productId + " no encontrado"));
-        ShoppingCart cart = this.findById(cartId);
+        ShoppingCart cart = this.findById(cartId, "userId");
 
         cart.getProducts().add(product);
         return cartRepository.save(cart);
     }
 
     public ShoppingCart removeProduct(String cartId, String productId) {
-        ShoppingCart cart = this.findById(cartId);
+        ShoppingCart cart = this.findById(cartId, "userId");
         Product product = cart.getProducts().stream().filter(p -> p.getId().equals(Long.valueOf(productId))).findFirst().orElseThrow(() -> new ProductNotFoundException("Producto con id " + productId + " no encontrado"));
         cart.getProducts().remove(product);
 

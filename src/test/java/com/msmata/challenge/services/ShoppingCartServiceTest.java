@@ -41,9 +41,9 @@ public class ShoppingCartServiceTest {
 
     @Test
     public void findByIdReturnsAShoppingCart() {
-        givenAShoppingCartWithIdExistsInDB("1234");
-        whenFindByIdIsExecuted("1234");
-        thenAShoppingCartWithIdIsReturned("1234");
+        givenAShoppingCartWithIdAndUserIdExistsInDB("1234", "user123");
+        whenFindByIdIsExecuted("1234", "user123");
+        thenAShoppingCartWithIdIsReturned("1234", "user123");
     }
 
     @Test
@@ -51,9 +51,21 @@ public class ShoppingCartServiceTest {
         givenAShoppingCartWithIdDoesNotExistInDB("123");
 
         try {
-            whenFindByIdIsExecuted("123");
+            whenFindByIdIsExecuted("123", "user456");
         } catch (Exception e) {
             Assertions.assertEquals(e.getMessage(), "Carrito con id 123 no encontrado");
+        }
+    }
+
+    @Test
+    public void throwsAnExceptionWhenCartDoesNotBelongToUser() {
+        givenAShoppingCartWithIdAndUserIdExistsInDB("1234", "user123");
+
+        try {
+            whenFindByIdIsExecuted("1234", "user456");
+            Assertions.fail("No deberia llegar aqui");
+        } catch (Exception e) {
+            Assertions.assertEquals(e.getMessage(), "Acceso prohibido a carrito");
         }
     }
 
@@ -86,9 +98,10 @@ public class ShoppingCartServiceTest {
         Mockito.when(shoppingCartRepository.save(Mockito.any(ShoppingCart.class))).thenReturn(mockShoppingCart);
     }
 
-    private void givenAShoppingCartWithIdExistsInDB(String id) {
+    private void givenAShoppingCartWithIdAndUserIdExistsInDB(String id, String userId) {
         ShoppingCart mockShoppingCart = new ShoppingCart();
         mockShoppingCart.setId(id);
+        mockShoppingCart.setUserId(userId);
         Mockito.when(shoppingCartRepository.findById(id)).thenReturn(Optional.of(mockShoppingCart));
     }
 
@@ -96,8 +109,8 @@ public class ShoppingCartServiceTest {
         Mockito.when(shoppingCartRepository.findById(id)).thenThrow(new CartNotFoundException("Carrito con id 123 no encontrado"));
     }
 
-    private void whenFindByIdIsExecuted(String id) {
-        shoppingCartResponse = shoppingCartService.findById(id);
+    private void whenFindByIdIsExecuted(String id, String userId) {
+        shoppingCartResponse = shoppingCartService.findById(id, userId);
     }
 
     private void whenCreateCartIsExecuted(String userId) {
@@ -108,8 +121,9 @@ public class ShoppingCartServiceTest {
         userShoppingCartResponse = shoppingCartService.getUserCarts(userId);
     }
 
-    private void thenAShoppingCartWithIdIsReturned(String id) {
+    private void thenAShoppingCartWithIdIsReturned(String id, String userId) {
         Assertions.assertEquals(shoppingCartResponse.getId(), id);
+        Assertions.assertEquals(shoppingCartResponse.getUserId(), userId);
     }
 
     private void thenAShoppingCartWithUserIdIsReturned(String userid) {

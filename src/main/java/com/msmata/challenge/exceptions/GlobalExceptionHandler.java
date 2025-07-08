@@ -26,4 +26,12 @@ public class GlobalExceptionHandler {
         body.put("timestamp", ZonedDateTime.now());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(ForbiddenAccessException.class)
+    public ResponseEntity<Object> handleForbiddenAccess(ForbiddenAccessException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        body.put("timestamp", ZonedDateTime.now());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
 }

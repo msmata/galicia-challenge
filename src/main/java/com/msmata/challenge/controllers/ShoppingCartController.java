@@ -5,6 +5,7 @@ import com.msmata.challenge.requests.CreateCartRequest;
 import com.msmata.challenge.services.ShoppingCartService;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -30,7 +31,8 @@ public class ShoppingCartController {
             @ApiResponse(code = 404, message = "Carrito no encontrado")
     })
     public ResponseEntity<ShoppingCart> getCart(@ApiParam("ID del carrito") @PathVariable String id) {
-        return ResponseEntity.ok(shoppingCartService.findById(id));
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(shoppingCartService.findById(id, userId));
     }
 
     @PostMapping
