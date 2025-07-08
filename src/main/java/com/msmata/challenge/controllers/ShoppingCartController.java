@@ -36,9 +36,10 @@ public class ShoppingCartController {
     }
 
     @PostMapping
-    @ApiOperation("Crear un carrito de compras para un userID determinado")
-    public ResponseEntity<ShoppingCart> createCart(@ApiParam("Request con ID del usuario") @RequestBody CreateCartRequest request) {
-        ShoppingCart saved = shoppingCartService.createCart(request.getUserId());
+    @ApiOperation("Crear un carrito de compras para el userID loggeado")
+    public ResponseEntity<ShoppingCart> createCart() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        ShoppingCart saved = shoppingCartService.createCart(userId);
         URI location = URI.create("/carts/" + saved.getId());
         return ResponseEntity.created(location).body(saved);
     }
