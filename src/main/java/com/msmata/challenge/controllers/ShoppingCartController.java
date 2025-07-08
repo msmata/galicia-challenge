@@ -1,7 +1,6 @@
 package com.msmata.challenge.controllers;
 
 import com.msmata.challenge.entities.ShoppingCart;
-import com.msmata.challenge.requests.CreateCartRequest;
 import com.msmata.challenge.services.ShoppingCartService;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -68,9 +67,10 @@ public class ShoppingCartController {
         return ResponseEntity.ok(shoppingCart);
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/")
     @ApiOperation("Listar los carritos de compras de un userID determinado")
-    public ResponseEntity<List<ShoppingCart>> listShoppingCarts(@ApiParam("ID del usuario") @PathVariable String userId) {
+    public ResponseEntity<List<ShoppingCart>> listShoppingCarts() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         List<ShoppingCart> userCarts = shoppingCartService.getUserCarts(userId);
         return ResponseEntity.ok(userCarts);
     }
