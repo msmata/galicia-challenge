@@ -24,13 +24,13 @@ public class AuthController {
         String username = credentials.get("username");
         String password = credentials.get("password");
 
-        if ("user".equals(username) && "pass".equals(password)) {
-            String token = jwtTokenUtil.generateToken(username);
-            Map<String, String> body = new HashMap<>();
-            body.put("token", token);
-            return ResponseEntity.ok(body);
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return userService.validateUser(username, password)
+            .map(user -> {
+                String token = jwtTokenUtil.generateToken(user.getUserId());
+                Map<String, String> body = new HashMap<>();
+                body.put("token", token);
+                return ResponseEntity.ok(body);
+            })
+            .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 }
