@@ -16,14 +16,18 @@ export let options = {
 const BASE_URL = 'http://localhost:8080';
 
 export default function () {
-    let resToken = http.get(`${BASE_URL}/auth/login/`, {
-        body: {
-            username: "user123",
-            password: "pass123"
-        }
+    const loginRes = http.post(`${BASE_URL}/auth/login`, JSON.stringify({
+        username: "user123",
+        password: "pass123"
+    }), {
+        headers: { 'Content-Type': 'application/json' },
     });
 
-    const token = `Bearer ${resToken.token}`;
+    check(loginRes, {
+        'login status 200': (r) => r.status === 200,
+    });
+
+    const token = `Bearer ${JSON.parse(loginRes.body).token}`;
 
     let res = http.get(`${BASE_URL}/carts/user/`, {
         headers: { Authorization: token },
