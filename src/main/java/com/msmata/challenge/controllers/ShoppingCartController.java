@@ -6,6 +6,8 @@ import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -15,9 +17,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/carts")
 @Api(tags = "Carrito de compras")
+@ApiImplicitParams({
+    @ApiImplicitParam(name = "Authorization", value = "Bearer {token}", required = true, dataType = "string", paramType = "header")
+})
 public class ShoppingCartController {
 
     private final ShoppingCartService shoppingCartService;
+
+    private static final Logger logger = LoggerFactory.getLogger(ShoppingCartController.class);
 
     public ShoppingCartController(ShoppingCartService shoppingCartService) {
         this.shoppingCartService = shoppingCartService;
@@ -31,15 +38,24 @@ public class ShoppingCartController {
             @ApiResponse(code = 403, message = "Acceso prohibido a carrito")
     })
     public ResponseEntity<ShoppingCart> getCart(@ApiParam("ID del carrito") @PathVariable String id) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(shoppingCartService.findById(id, userId));
+        String userId = getAuthenticatedUserId();
+        logger.info("GET /carts/{} solicitado por userId={}", id, userId);
+
+        ShoppingCart cart = shoppingCartService.findById(id, userId);
+        logger.info("Carrito encontrado: {}", cart.getId());
+
+        return ResponseEntity.ok(cart);
     }
 
     @PostMapping
     @ApiOperation("Crear un carrito de compras para el userID loggeado")
     public ResponseEntity<ShoppingCart> createCart() {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String userId = getAuthenticatedUserId();
+        logger.info("POST /carts solicitado por userId={}", userId);
+
         ShoppingCart saved = shoppingCartService.createCart(userId);
+        logger.info("Carrito creado: {}", saved.getId());
+
         URI location = URI.create("/carts/" + saved.getId());
         return ResponseEntity.created(location).body(saved);
     }
@@ -53,8 +69,12 @@ public class ShoppingCartController {
             @ApiResponse(code = 403, message = "Acceso prohibido a carrito")
     })
     public ResponseEntity<ShoppingCart> updateCartProducts(@ApiParam("ID del carrito") @PathVariable String cartId,@ApiParam("ID del producto")  @PathVariable String productId) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String userId = getAuthenticatedUserId();
+        logger.info("PUT /carts/{}/product/{} solicitado por userId={}", cartId, productId, userId);
+
         ShoppingCart shoppingCart = shoppingCartService.addProductToCart(cartId, productId, userId);
+        logger.info("Producto {} agregado al carrito {}", productId, cartId);
+
         return ResponseEntity.ok(shoppingCart);
     }
 
@@ -67,26 +87,42 @@ public class ShoppingCartController {
             @ApiResponse(code = 403, message = "Acceso prohibido a carrito")
     })
     public ResponseEntity<ShoppingCart> removeProduct(@ApiParam("ID del carrito") @PathVariable String cartId, @ApiParam("ID del producto") @PathVariable String productId) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String userId = getAuthenticatedUserId();
+        logger.info("DELETE /carts/{}/product/{} solicitado por userId={}", cartId, productId, userId);
+
         ShoppingCart shoppingCart = shoppingCartService.removeProduct(cartId, productId, userId);
+        logger.info("Producto {} removido del carrito {}", productId, cartId);
+
         return ResponseEntity.ok(shoppingCart);
     }
 
     @GetMapping("/user/")
     @ApiOperation("Listar los carritos de compras de un userID determinado")
     public ResponseEntity<List<ShoppingCart>> listShoppingCarts() {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String userId = getAuthenticatedUserId();
+        logger.info("GET /carts/user solicitado por userId={}", userId);
+
         List<ShoppingCart> userCarts = shoppingCartService.getUserCarts(userId);
+        logger.info("Se encontraron {} carritos para userId={}", userCarts.size(), userId);
+
         return ResponseEntity.ok(userCarts);
     }
 
     @PostMapping("/{id}/process")
     @ApiOperation("Procesar los articulos de un determinado carrito de compras")
     public ResponseEntity<Map<String, String>> processCart(@ApiParam("ID del carrito") @PathVariable String id) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String userId = getAuthenticatedUserId();
+        logger.info("POST /carts/{}/process solicitado por userId={}", id, userId);
+
         shoppingCartService.processOrder(id, userId);
+        logger.info("Se inició el procesamiento asincrónico del carrito {}", id);
+
         Map<String, String> response = new HashMap<>();
         response.put("message", "Estamos procesando su orden");
         return ResponseEntity.accepted().body(response);
+    }
+
+    private String getAuthenticatedUserId() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }
