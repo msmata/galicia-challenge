@@ -16,7 +16,7 @@ export let options = {
 const BASE_URL = 'http://localhost:8080';
 
 export default function () {
-    let resToken = hhtp.get(`${BASE_URL}/auth/login/`, {
+    let resToken = http.get(`${BASE_URL}/auth/login/`, {
         body: {
             username: "user123",
             password: "pass123"
