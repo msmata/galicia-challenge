@@ -39,7 +39,11 @@ public class ShoppingCartService {
     }
 
     public ShoppingCart findById(String cartId, String userId) {
-        ShoppingCart shoppingCart = cartRepository.findById(cartId).orElseThrow(() -> new CartNotFoundException("Carrito con id " + cartId + " no encontrado"));
+        ShoppingCart shoppingCart = cartRepository.findById(cartId)
+                .orElseThrow(() -> {
+                    logger.warn("CartNotFoundException: carrito {} no encontrado", cartId);
+                    return new CartNotFoundException("Carrito con id " + cartId + " no encontrado");
+                });
 
         if (!shoppingCart.getUserId().equals(userId)) {
             throw new ForbiddenAccessException("Acceso prohibido a carrito");
@@ -50,16 +54,30 @@ public class ShoppingCartService {
 
     public ShoppingCart addProductToCart(String cartId, String productId, String userId) {
         ShoppingCart cart = this.findById(cartId, userId);
-        Product product = productRepository.findById(Long.valueOf(productId)).orElseThrow(() -> new ProductNotFoundException("Producto con id " + productId + " no encontrado"));
+        Product product = productRepository.findById(Long.valueOf(productId))
+                .orElseThrow(() -> {
+                    logger.warn("ProductNotFoundException: producto {} no encontrado", productId);
+                    return new ProductNotFoundException("Producto con id " + productId + " no encontrado");
+                });
 
         cart.getProducts().add(product);
+        logger.debug("Producto {} agregado a carrito {}", productId, cartId);
+
         return cartRepository.save(cart);
     }
 
     public ShoppingCart removeProduct(String cartId, String productId, String userId) {
         ShoppingCart cart = this.findById(cartId, userId);
-        Product product = cart.getProducts().stream().filter(p -> p.getId().equals(Long.valueOf(productId))).findFirst().orElseThrow(() -> new ProductNotFoundException("Producto con id " + productId + " no encontrado"));
+        Product product = cart.getProducts().stream()
+                .filter(p -> p.getId().equals(Long.valueOf(productId)))
+                .findFirst()
+                .orElseThrow(() -> {
+                    logger.warn("Producto {} no estaba en el carrito {}", productId, cartId);
+                    return new ProductNotFoundException("Producto con id " + productId + " no encontrado");
+                });
+
         cart.getProducts().remove(product);
+        logger.debug("Producto {} removido del carrito {}", productId, cartId);
 
         return cartRepository.save(cart);
     }
@@ -80,6 +98,7 @@ public class ShoppingCartService {
                     .map(Discount::getPercent)
                     .orElse(0.0);
                 double priceWithDiscount = p.getPrice() * (1 - discount);
+                logger.debug("Producto {}: precio base={}, descuento={}%, final={}", p.getName(), p.getPrice(), discount * 100, priceWithDiscount);
                 total += priceWithDiscount;
             }
 
