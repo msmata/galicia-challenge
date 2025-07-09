@@ -27,7 +27,8 @@ public class ShoppingCartController {
     @ApiOperation("Obtener un carrito de compras por id de carrito")
     @ApiResponses( value = {
             @ApiResponse(code = 200, message = "Carrito encontrado"),
-            @ApiResponse(code = 404, message = "Carrito no encontrado")
+            @ApiResponse(code = 404, message = "Carrito no encontrado"),
+            @ApiResponse(code = 403, message = "Acceso prohibido a carrito")
     })
     public ResponseEntity<ShoppingCart> getCart(@ApiParam("ID del carrito") @PathVariable String id) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -48,10 +49,12 @@ public class ShoppingCartController {
     @ApiResponses( value = {
             @ApiResponse(code = 200, message = "Carrito actualizado"),
             @ApiResponse(code = 404, message = "Carrito no encontrado"),
-            @ApiResponse(code = 404, message = "Producto no encontrado")
+            @ApiResponse(code = 404, message = "Producto no encontrado"),
+            @ApiResponse(code = 403, message = "Acceso prohibido a carrito")
     })
     public ResponseEntity<ShoppingCart> updateCartProducts(@ApiParam("ID del carrito") @PathVariable String cartId,@ApiParam("ID del producto")  @PathVariable String productId) {
-        ShoppingCart shoppingCart = shoppingCartService.addProductToCart(cartId, productId);
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        ShoppingCart shoppingCart = shoppingCartService.addProductToCart(cartId, productId, userId);
         return ResponseEntity.ok(shoppingCart);
     }
 
@@ -60,10 +63,12 @@ public class ShoppingCartController {
     @ApiResponses( value = {
             @ApiResponse(code = 200, message = "Carrito actualizado"),
             @ApiResponse(code = 404, message = "Carrito no encontrado"),
-            @ApiResponse(code = 404, message = "Producto no encontrado")
+            @ApiResponse(code = 404, message = "Producto no encontrado"),
+            @ApiResponse(code = 403, message = "Acceso prohibido a carrito")
     })
     public ResponseEntity<ShoppingCart> removeProduct(@ApiParam("ID del carrito") @PathVariable String cartId, @ApiParam("ID del producto") @PathVariable String productId) {
-        ShoppingCart shoppingCart = shoppingCartService.removeProduct(cartId, productId);
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        ShoppingCart shoppingCart = shoppingCartService.removeProduct(cartId, productId, userId);
         return ResponseEntity.ok(shoppingCart);
     }
 
@@ -78,7 +83,8 @@ public class ShoppingCartController {
     @PostMapping("/{id}/process")
     @ApiOperation("Procesar los articulos de un determinado carrito de compras")
     public ResponseEntity<Map<String, String>> processCart(@ApiParam("ID del carrito") @PathVariable String id) {
-        shoppingCartService.processOrder(id);
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        shoppingCartService.processOrder(id, userId);
         Map<String, String> response = new HashMap<>();
         response.put("message", "Estamos procesando su orden");
         return ResponseEntity.accepted().body(response);

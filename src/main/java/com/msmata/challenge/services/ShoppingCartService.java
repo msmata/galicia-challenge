@@ -48,16 +48,16 @@ public class ShoppingCartService {
         return shoppingCart;
     }
 
-    public ShoppingCart addProductToCart(String cartId, String productId) {
+    public ShoppingCart addProductToCart(String cartId, String productId, String userId) {
+        ShoppingCart cart = this.findById(cartId, userId);
         Product product = productRepository.findById(Long.valueOf(productId)).orElseThrow(() -> new ProductNotFoundException("Producto con id " + productId + " no encontrado"));
-        ShoppingCart cart = this.findById(cartId, "userId");
 
         cart.getProducts().add(product);
         return cartRepository.save(cart);
     }
 
-    public ShoppingCart removeProduct(String cartId, String productId) {
-        ShoppingCart cart = this.findById(cartId, "userId");
+    public ShoppingCart removeProduct(String cartId, String productId, String userId) {
+        ShoppingCart cart = this.findById(cartId, userId);
         Product product = cart.getProducts().stream().filter(p -> p.getId().equals(Long.valueOf(productId))).findFirst().orElseThrow(() -> new ProductNotFoundException("Producto con id " + productId + " no encontrado"));
         cart.getProducts().remove(product);
 
@@ -69,10 +69,10 @@ public class ShoppingCartService {
     }
 
     @Async
-    public void processOrder(String cartId) {
+    public void processOrder(String cartId, String userId) {
         logger.info("Inicio del procesamiento asincrónico del carrito: {}", cartId);
 
-        cartRepository.findByIdWithProducts(cartId).ifPresent(cart -> {
+        cartRepository.findByIdWithProducts(cartId, userId).ifPresent(cart -> {
             double total = 0.0;
 
             for (Product p : cart.getProducts()) {
