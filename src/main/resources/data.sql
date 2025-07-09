@@ -4,3 +4,6 @@ INSERT INTO PRODUCT (code, name, price, category) VALUES ('9c77a5833f47', 'Marti
 
 INSERT INTO discount (category, percent) VALUES ('tecnology', 0.10);
 INSERT INTO discount (category, percent) VALUES ('libros', 0.05);
+
+INSERT INTO users (user_id, password) VALUES ('user123', 'pass123');
+INSERT INTO users (user_id, password) VALUES ('admin', 'adminpass');
