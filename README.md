@@ -42,3 +42,5 @@ Desde ahí se podrá:
 - Ver los modelos utilizados (carrito, producto, etc.)
 - Ver respuestas esperadas y códigos HTTP
 
+📊 [Ver informe de pruebas de carga](./stress-test-report.md)
+
